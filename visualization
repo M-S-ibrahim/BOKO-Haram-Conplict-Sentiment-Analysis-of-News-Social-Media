@@ -1,0 +1,32 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# Convert data to DataFrame
+tweet_df = pd.DataFrame(tweets, columns=['Date', 'Tweet', 'Sentiment'])
+news_df = pd.DataFrame(news, columns=['Date', 'Title', 'Content', 'Sentiment'])
+
+# Convert Date column to datetime
+tweet_df['Date'] = pd.to_datetime(tweet_df['Date'])
+news_df['Date'] = pd.to_datetime(news_df['Date'])
+
+# Plot sentiment trends over time
+plt.figure(figsize=(12, 6))
+sns.lineplot(data=tweet_df, x='Date', y='Sentiment', label='Twitter')
+sns.lineplot(data=news_df, x='Date', y='Sentiment', label='News')
+plt.title('Sentiment Trends Over Time')
+plt.xlabel('Date')
+plt.ylabel('Sentiment')
+plt.legend()
+plt.show()
+
+
+
+  import plotly.express as px
+
+# Create an interactive line plot
+fig = px.line(tweet_df, x='Date', y='Sentiment', title='Twitter Sentiment Trends')
+fig.show()
+
+fig = px.line(news_df, x='Date', y='Sentiment', title='News Sentiment Trends')
+fig.show()
