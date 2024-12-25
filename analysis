@@ -1,0 +1,71 @@
+pip install tweepy beautifulsoup4 requests textblob vaderSentiment matplotlib seaborn
+
+import tweepy
+
+# Twitter API credentials
+consumer_key = 'YOUR_CONSUMER_KEY'
+consumer_secret = 'YOUR_CONSUMER_SECRET'
+access_token = 'YOUR_ACCESS_TOKEN'
+access_token_secret = 'YOUR_ACCESS_TOKEN_SECRET'
+
+# Authenticate with the Twitter API
+auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+api = tweepy.API(auth)
+
+# Function to fetch tweets
+def fetch_tweets(query, count=100):
+    tweets = tweepy.Cursor(api.search_tweets, q=query, lang="en").items(count)
+    tweet_list = [[tweet.created_at, tweet.text] for tweet in tweets]
+    return tweet_list
+
+# Example usage
+tweets = fetch_tweets("conflict keyword", 200)
+
+
+
+
+import requests
+from bs4 import BeautifulSoup
+
+# Function to scrape news articles
+def fetch_news(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    articles = soup.find_all('article')
+    news_list = [[article.find('time').get('datetime'), article.find('h2').text, article.find('p').text] for article in articles]
+    return news_list
+
+# Example usage
+news = fetch_news("https://newswebsite.com/section/conflict")
+
+
+
+from textblob import TextBlob
+
+def analyze_sentiment_textblob(text):
+    analysis = TextBlob(text)
+    return analysis.sentiment.polarity
+
+# Example usage
+for tweet in tweets:
+    tweet.append(analyze_sentiment_textblob(tweet[1]))
+
+for article in news:
+    article.append(analyze_sentiment_textblob(article[2]))
+
+
+
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+analyzer = SentimentIntensityAnalyzer()
+
+def analyze_sentiment_vader(text):
+    vs = analyzer.polarity_scores(text)
+    return vs['compound']
+
+# Example usage
+for tweet in tweets:
+    tweet.append(analyze_sentiment_vader(tweet[1]))
+
+for article in news:
+    article.append(analyze_sentiment_vader(article[2]))
